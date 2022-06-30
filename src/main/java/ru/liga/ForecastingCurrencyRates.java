@@ -2,12 +2,19 @@ package ru.liga;
 
 import ru.liga.controller.ConsoleController;
 import ru.liga.controller.Controller;
+import ru.liga.repository.CurrencyRepository;
+import ru.liga.service.AvgForecasting;
+import ru.liga.service.Forecasting;
+
+import java.util.Scanner;
 
 public class ForecastingCurrencyRates {
 
-    //TODO: main переписать, он должен быть максимально чистым. тут не должно быть никакого парсинга/вызова команд
     public static void main(String[] args) {
-        Controller consoleController = new ConsoleController();
+        CurrencyRepository currencyRepository = CurrencyRepository.getInstance();
+        Forecasting forecasting = new AvgForecasting(currencyRepository);
+        Scanner scanner = new Scanner(System.in);
+        Controller consoleController = new ConsoleController(forecasting, scanner);
         consoleController.getForecastingCurrencyRates();
     }
 }

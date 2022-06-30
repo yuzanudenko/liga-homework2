@@ -7,10 +7,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class FileUtils {    //TODO: убрать статику - это непотокобезопасно. Если была цель иметь только один экземпляр этого класса - нужно использовать Singleton паттерн.
+public class FileUtils {
     private static FileUtils instance;
 
-    private FileUtils() {}
+    private FileUtils() {
+    }
 
     public static synchronized FileUtils getInstance() {
         if (instance == null) {
@@ -22,7 +23,7 @@ public class FileUtils {    //TODO: убрать статику - это неп�
     /**
      * Поиск файла c расширение *.csv по части названия
      *
-     * @param currencyName  Название валюты на латинице
+     * @param currencyName Название валюты на латинице
      * @return Путь до файла
      */
     public Path findFilePath(String currencyName) {
@@ -48,7 +49,7 @@ public class FileUtils {    //TODO: убрать статику - это неп�
      */
     private Path getResourcesPath() {
         URL location = FileUtils.class.getProtectionDomain().getCodeSource().getLocation();
-        try {   //TODO: два try/catch'a - такого не должно быть, обычно это означает что у метода два назначения (см. Принципы SOLID, принцип единой ответственности, относится не только к классам, но и к методам)
+        try {
             return Paths.get(location.toURI())
                     .resolve("../classes/currencyHistoryData")
                     .normalize();

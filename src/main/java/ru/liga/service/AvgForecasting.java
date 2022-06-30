@@ -1,46 +1,53 @@
 package ru.liga.service;
 
-import ru.liga.config.CurrencyName;
+import ru.liga.enums.CurrencyName;
+import ru.liga.exception.CurrencyNotFoundException;
 import ru.liga.model.Currency;
 import ru.liga.repository.CurrencyRepository;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ForecastingLastSeven implements Forecasting {  //TODO: статика
-    //TODO: методы класса нетестируемые, хотя содержат бизнесовую логику
-    //TODO: методы класса завязаны на конкретную реализацию. Если изменится интерфейс вызова с консоли, напр., на рест - придется полностью переписывать код
+import static java.math.RoundingMode.HALF_DOWN;
 
-    CurrencyRepository currencyRepository = CurrencyRepository.getInstance();
+public class AvgForecasting implements Forecasting {
+
+    private final CurrencyRepository currencyRepository;
+
+    public AvgForecasting(CurrencyRepository currencyRepository) {
+        this.currencyRepository = currencyRepository;
+    }
 
     /**
      * Прогнозирование курса валюты на следующий день от заданной даты
      *
-     * @param currencyName  Название валюты
-     * @param startDate     Дата с которой ведётся отсчёт
+     * @param currencyName Название валюты
+     * @param startDate    Дата с которой ведётся отсчёт
      * @return Список спрогнозированных курсов указанной валюты
      */
-    //TODO: у этого метода слишком много ответственности - это не просто сервис прогноза, а сервис который форматирует, считает и выводит в консоль команду
     //TODO: а что если изменится алгоритм или добавится новый? Нельзя влезать в реализацию текущего метода, если добавляется новый алгоритм
     public List<Currency> forecastingTomorrowRate(String currencyName, LocalDate startDate) {
-        LocalDate localStartDate = startDate;  //TODO: лучше использовать новый API - java.util.time.LocalDate, с ним проще работать
+        LocalDate localStartDate = startDate;
         LocalDate tomorrowDate = startDate;
         tomorrowDate = tomorrowDate.plusDays(1L);
-        String curTranslateName = CurrencyName.getByName(currencyName).getTranslate();
+        String curTranslateName = CurrencyName.getByName(currencyName)
+                .orElseThrow(CurrencyNotFoundException::new)
+                .getTranslate();
         List<Currency> result = new ArrayList<>();
         Currency currency = currencyRepository.findOneByNameAndDate(curTranslateName, tomorrowDate);
 
         if (currency == null) {
-            double forecastingRate = 0D;
+            BigDecimal forecastingRate = BigDecimal.ZERO;
 
             List<Currency> lastSevenCurrency = currencyRepository.findLastSevenFromDateByName(curTranslateName, localStartDate);
             for (Currency lastCurrency : lastSevenCurrency) {
-                forecastingRate += lastCurrency.getRate() / lastCurrency.getNominal();
+                forecastingRate = forecastingRate.add(lastCurrency.getRateDividedNominal());
                 localStartDate = localStartDate.minusDays(1L);
             }
 
-            forecastingRate /= 7;
+            forecastingRate = forecastingRate.divide(BigDecimal.valueOf(7), HALF_DOWN);
 
             currency = new Currency(1, forecastingRate, tomorrowDate, curTranslateName);
             currencyRepository.addNewCurrency(currency);
@@ -53,8 +60,8 @@ public class ForecastingLastSeven implements Forecasting {  //TODO: статик
     /**
      * Прогнозирование курса валюты на неделю от указанной даты
      *
-     * @param currencyName  Название валюты
-     * @param startDate     Дата с которой ведётся отсчёт
+     * @param currencyName Название валюты
+     * @param startDate    Дата с которой ведётся отсчёт
      * @return Список спрогнозированных курсов указанной валюты
      */
     public List<Currency> forecastingWeekRate(String currencyName, LocalDate startDate) {

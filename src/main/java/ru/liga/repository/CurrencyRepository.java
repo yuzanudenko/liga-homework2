@@ -11,9 +11,9 @@ import java.util.List;
 public class CurrencyRepository {
 
     private static CurrencyRepository instance;
-    private static List<Currency> historyData = new ArrayList<>();
+    private final static List<Currency> historyData = new ArrayList<>();
 
-    static  {
+    static {
         FileUtils fileUtils = FileUtils.getInstance();
         ReadCSV readCSV = new ReadCSV();
         historyData.addAll(readCSV.setCSVParser(fileUtils.findFilePath("EUR")).getCurrencyFromCSV());
@@ -34,8 +34,8 @@ public class CurrencyRepository {
     /**
      * Поиск валюты по названию за указанную дату
      *
-     * @param name  Название валюты
-     * @param date  Дата за которую требуется найти валюту
+     * @param name Название валюты
+     * @param date Дата за которую требуется найти валюту
      * @return Валюта за указанную дату
      */
     public Currency findOneByNameAndDate(String name, LocalDate date) {
@@ -46,10 +46,10 @@ public class CurrencyRepository {
     }
 
     /**
-     * Поиск семи валюты по названию с указанной даты
+     * Поиск семи валют по названию с указанной даты
      *
-     * @param name  Название валюты
-     * @param date  Дата с которой требуется искать валюты
+     * @param name Название валюты
+     * @param date Дата с которой требуется искать валюты
      * @return Список из семи валют с указанной даты
      */
     public List<Currency> findLastSevenFromDateByName(String name, LocalDate date) {
