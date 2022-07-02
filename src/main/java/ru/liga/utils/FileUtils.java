@@ -54,7 +54,7 @@ public class FileUtils {
                     .resolve("../classes/currencyHistoryData")
                     .normalize();
         } catch (URISyntaxException e) {
-            throw new RuntimeException(e);  //TODO: правильно, что перехватываешь все exception'ы, но было б неплохо, если бы они были кастомные, а не просто Runtime, Но требовать не буду
+            throw new RuntimeException(e);
         }
     }
 }

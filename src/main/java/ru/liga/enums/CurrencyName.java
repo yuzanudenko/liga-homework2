@@ -11,7 +11,9 @@ import java.util.stream.Stream;
 public enum CurrencyName {
     EUR("Евро"),
     USD("Доллар США"),
-    TRY("Турецкая лира");
+    TRY("Турецкая лира"),
+    BGN("Болгарский лев"),
+    AMD("Армянский драм");
 
     private final String translate;
 

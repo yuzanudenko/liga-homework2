@@ -11,7 +11,7 @@ import java.util.List;
 public class CurrencyRepository {
 
     private static CurrencyRepository instance;
-    private final static List<Currency> historyData = new ArrayList<>();
+    private static final List<Currency> historyData = new ArrayList<>();
 
     static {
         FileUtils fileUtils = FileUtils.getInstance();
@@ -19,6 +19,8 @@ public class CurrencyRepository {
         historyData.addAll(readCSV.setCSVParser(fileUtils.findFilePath("EUR")).getCurrencyFromCSV());
         historyData.addAll(readCSV.setCSVParser(fileUtils.findFilePath("USD")).getCurrencyFromCSV());
         historyData.addAll(readCSV.setCSVParser(fileUtils.findFilePath("TRY")).getCurrencyFromCSV());
+        historyData.addAll(readCSV.setCSVParser(fileUtils.findFilePath("BGN")).getCurrencyFromCSV());
+        historyData.addAll(readCSV.setCSVParser(fileUtils.findFilePath("AMD")).getCurrencyFromCSV());
     }
 
     private CurrencyRepository() {
@@ -46,16 +48,17 @@ public class CurrencyRepository {
     }
 
     /**
-     * Поиск семи валют по названию с указанной даты
+     * Поиск нескольких валют по названию с указанной даты
      *
-     * @param name Название валюты
-     * @param date Дата с которой требуется искать валюты
-     * @return Список из семи валют с указанной даты
+     * @param name            Название валюты
+     * @param date            Дата с которой требуется искать валюты
+     * @param currencyNumbers Количество записей которые нужно достать
+     * @return Список из нескольких валют с указанной даты
      */
-    public List<Currency> findLastSevenFromDateByName(String name, LocalDate date) {
+    public List<Currency> findLastSeveralFromDateByName(String name, LocalDate date, int currencyNumbers) {
         List<Currency> lastSeven = new ArrayList<>();
         LocalDate startDate = date;
-        for (int i = 0; i < 7; ) {
+        for (int i = 0; i < currencyNumbers; ) {
             Currency cur = this.findOneByNameAndDate(name, startDate);
             if (cur != null) {
                 lastSeven.add(cur);
